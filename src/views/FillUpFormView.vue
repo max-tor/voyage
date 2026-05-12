@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import { useGarageStore } from '@/stores/garage'
 import { useFillUpsStore } from '@/stores/fillups'
+import { recordStationPrice, upsertStation } from '@/services/stations-db'
 import {
   CURRENCIES,
   FUEL_TYPE_LABELS,
@@ -11,10 +13,40 @@ import {
   type FuelType,
 } from '@/types/database'
 
+interface StationContext {
+  osm_id: string
+  lat: number
+  lng: number
+  name: string | null
+  brand: string | null
+  address: string | null
+}
+
 const route = useRoute()
 const router = useRouter()
+const auth = useAuthStore()
 const garage = useGarageStore()
 const fillups = useFillUpsStore()
+
+function readStationContext(): StationContext | null {
+  const osm_id = route.query.osmId as string | undefined
+  const latStr = route.query.lat as string | undefined
+  const lngStr = route.query.lng as string | undefined
+  if (!osm_id || !latStr || !lngStr) return null
+  const lat = Number(latStr)
+  const lng = Number(lngStr)
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null
+  return {
+    osm_id,
+    lat,
+    lng,
+    name: (route.query.name as string | undefined) || null,
+    brand: (route.query.brand as string | undefined) || null,
+    address: (route.query.address as string | undefined) || null,
+  }
+}
+
+const stationContext = ref<StationContext | null>(readStationContext())
 
 const isEdit = computed(() => typeof route.params.id === 'string' && route.params.id !== 'new')
 const fillupId = computed(() => (isEdit.value ? (route.params.id as string) : null))
@@ -178,6 +210,16 @@ async function save() {
     return
   }
 
+  let stationId: string | null = null
+  if (stationContext.value) {
+    try {
+      stationId = await upsertStation(stationContext.value)
+    } catch (e) {
+      // Station upsert is best-effort; the fill-up still saves without a link.
+      console.warn('Station upsert failed', e)
+    }
+  }
+
   const payload = {
     car_id: carId.value,
     date: composeDate(),
@@ -188,9 +230,9 @@ async function save() {
     total_cost: cost.value,
     currency: currency.value,
     full_tank: fullTank.value,
-    station_id: null,
-    lat: null,
-    lng: null,
+    station_id: stationId,
+    lat: stationContext.value?.lat ?? null,
+    lng: stationContext.value?.lng ?? null,
     notes: notes.value || null,
   }
 
@@ -200,6 +242,19 @@ async function save() {
       await fillups.update(fillupId.value, payload, carId.value)
     } else {
       await fillups.create(payload)
+    }
+    if (stationId && price.value != null && auth.user) {
+      try {
+        await recordStationPrice({
+          stationId,
+          fuelType: fuelType.value,
+          price: price.value,
+          currency: currency.value,
+          userId: auth.user.id,
+        })
+      } catch (e) {
+        console.warn('Crowdsourced price recording failed', e)
+      }
     }
     router.replace('/fillups')
   } catch (e) {
@@ -248,6 +303,19 @@ async function remove() {
     </div>
 
     <form v-else class="space-y-6" @submit.prevent="save">
+      <div
+        v-if="stationContext"
+        class="rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800 ring-1 ring-emerald-200"
+      >
+        <p class="font-semibold">
+          Fueling at: {{ stationContext.name ?? stationContext.brand ?? 'Selected station' }}
+        </p>
+        <p v-if="stationContext.address" class="truncate">{{ stationContext.address }}</p>
+        <p class="mt-1 text-emerald-700">
+          Your fuel price will be saved as a crowdsourced data point for this station.
+        </p>
+      </div>
+
       <fieldset class="space-y-4 rounded-lg bg-white p-4 ring-1 ring-slate-200">
         <label class="block">
           <span class="text-sm font-medium text-slate-700">Car</span>

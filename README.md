@@ -25,6 +25,18 @@ npm install
 npm run dev
 ```
 
+### Optional: live fuel prices in Germany
+
+Voyage will use the free TankerKönig API if you provide a key. Register at
+https://creativecommons.tankerkoenig.de/api/ and add it to your `.env`:
+
+```
+VITE_TANKERKONIG_API_KEY=your-key-here
+```
+
+Restart `npm run dev` after editing `.env`. Without a key, German station
+prices fall back to crowdsourced data (same as every other country).
+
 ## Scripts
 
 | Script | What it does |
