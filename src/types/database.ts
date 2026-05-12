@@ -43,3 +43,45 @@ export const FUEL_TYPE_LABELS: Record<FuelType, string> = {
   lpg: 'LPG',
   cng: 'CNG',
 }
+
+export interface FillUp {
+  id: string
+  user_id: string
+  car_id: string
+  date: string
+  odometer: number
+  fuel_volume: number
+  fuel_type: FuelType
+  fuel_price: number | null
+  total_cost: number | null
+  currency: string
+  full_tank: boolean
+  station_id: string | null
+  lat: number | null
+  lng: number | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type FillUpInsert = Omit<FillUp, 'id' | 'user_id' | 'created_at' | 'updated_at'>
+export type FillUpUpdate = Partial<FillUpInsert>
+
+export const CURRENCIES = [
+  'EUR',
+  'USD',
+  'CAD',
+  'GBP',
+  'CHF',
+  'PLN',
+  'CZK',
+  'SEK',
+  'NOK',
+  'DKK',
+  'UAH',
+  'TRY',
+  'JPY',
+  'AUD',
+] as const
+
+export type Currency = (typeof CURRENCIES)[number]

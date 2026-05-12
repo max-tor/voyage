@@ -31,6 +31,16 @@ const router = createRouter({
       component: () => import('@/views/FillUpsView.vue'),
     },
     {
+      path: '/fillups/new',
+      name: 'fillups-new',
+      component: () => import('@/views/FillUpFormView.vue'),
+    },
+    {
+      path: '/fillups/:id',
+      name: 'fillups-edit',
+      component: () => import('@/views/FillUpFormView.vue'),
+    },
+    {
       path: '/garage',
       name: 'garage',
       component: () => import('@/views/GarageView.vue'),
