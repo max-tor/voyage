@@ -190,7 +190,7 @@ function relativeTime(iso: string): string {
         <span v-else-if="stations.error" class="text-xs text-red-600">{{ stations.error }}</span>
         <span v-else class="text-xs text-slate-500">
           {{ stations.items.length }} found
-          <template v-if="stations.source === 'tankerkonig'"> · live</template>
+          <template v-if="stations.source === 'dgeg'"> · live</template>
         </span>
       </div>
 

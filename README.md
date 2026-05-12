@@ -25,17 +25,23 @@ npm install
 npm run dev
 ```
 
-### Optional: live fuel prices in Germany
+### How prices work
 
-Voyage will use the free TankerKönig API if you provide a key. Register at
-https://creativecommons.tankerkoenig.de/api/ and add it to your `.env`:
+There is no single fuel-price API that covers all of Europe + Canada — the
+data is fragmented across national open-data sources, and Canada has no
+free real-time API at all. Voyage uses a per-country provider pattern:
 
-```
-VITE_TANKERKONIG_API_KEY=your-key-here
-```
+- **🇵🇹 Portugal** — DGEG official API (`precoscombustiveis.dgeg.gov.pt`), no
+  key required, returns E5 + Diesel prices.
+- **Everywhere else** — stations come from OpenStreetMap (free Overpass
+  API); prices come from your `station_prices` table, which is fed every
+  time a user logs a fill-up at a station tapped from the map.
 
-Restart `npm run dev` after editing `.env`. Without a key, German station
-prices fall back to crowdsourced data (same as every other country).
+To extend coverage, add a new file under `src/services/prices/` that exports
+a function matching `fetchDgegStations`'s signature, then wire it into the
+country branch in `src/stores/stations.ts`. Candidates with free open data:
+🇫🇷 prix-carburants.gouv.fr, 🇦🇹 spritpreisrechner.at, 🇪🇸 geoportalgasolineras.es,
+🇮🇹 MIMIT, 🇩🇪 TankerKönig.
 
 ## Scripts
 
