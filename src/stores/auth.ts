@@ -8,6 +8,8 @@ interface AuthState {
   ready: boolean
 }
 
+let initPromise: Promise<void> | null = null
+
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => ({
     user: null,
@@ -18,17 +20,21 @@ export const useAuthStore = defineStore('auth', {
     isAuthenticated: (s) => s.user !== null,
   },
   actions: {
-    async init() {
-      const { data } = await supabase.auth.getSession()
-      this.session = data.session
-      this.user = data.session?.user ?? null
+    init(): Promise<void> {
+      if (initPromise) return initPromise
+      initPromise = (async () => {
+        const { data } = await supabase.auth.getSession()
+        this.session = data.session
+        this.user = data.session?.user ?? null
 
-      supabase.auth.onAuthStateChange((_event, session) => {
-        this.session = session
-        this.user = session?.user ?? null
-      })
+        supabase.auth.onAuthStateChange((_event, session) => {
+          this.session = session
+          this.user = session?.user ?? null
+        })
 
-      this.ready = true
+        this.ready = true
+      })()
+      return initPromise
     },
     async signUp(email: string, password: string) {
       const { data, error } = await supabase.auth.signUp({ email, password })
