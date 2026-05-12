@@ -20,9 +20,7 @@ const isEdit = computed(() => typeof route.params.id === 'string' && route.param
 const fillupId = computed(() => (isEdit.value ? (route.params.id as string) : null))
 
 const carId = ref<string>('')
-const mode = ref<'odo' | 'trip'>('odo')
 const odoInput = ref<number | null>(null)
-const tripInput = ref<number | null>(null)
 const volume = ref<number | null>(null)
 const fuelType = ref<FuelType>('gasoline')
 const price = ref<number | null>(null)
@@ -66,7 +64,6 @@ onMounted(async () => {
     if (isEdit.value && fillupId.value) {
       const f = await fillups.fetchOne(fillupId.value)
       carId.value = f.car_id
-      mode.value = 'odo'
       odoInput.value = Number(f.odometer)
       volume.value = Number(f.fuel_volume)
       fuelType.value = f.fuel_type
@@ -165,24 +162,17 @@ function composeDate(): string {
   return new Date(y, m - 1, d, hh, mm).toISOString()
 }
 
-function resolveOdometer(): number | null {
-  if (mode.value === 'odo') return odoInput.value
-  if (tripInput.value == null) return null
-  const base = lastFillUp.value ? Number(lastFillUp.value.odometer) : 0
-  return round(base + tripInput.value, 1)
-}
-
 async function save() {
   error.value = null
   if (!carId.value) {
     error.value = 'Pick a car first'
     return
   }
-  const odometer = resolveOdometer()
-  if (odometer == null) {
-    error.value = 'Enter an odometer or trip value'
+  if (odoInput.value == null) {
+    error.value = 'Enter the odometer value'
     return
   }
+  const odometer = odoInput.value
   if (volume.value == null || volume.value <= 0) {
     error.value = 'Enter the fuel volume'
     return
@@ -271,26 +261,7 @@ async function remove() {
       </fieldset>
 
       <fieldset class="space-y-4 rounded-lg bg-white p-4 ring-1 ring-slate-200">
-        <div class="flex overflow-hidden rounded-full bg-slate-100">
-          <button
-            type="button"
-            class="flex-1 px-3 py-2 text-sm transition-colors"
-            :class="mode === 'odo' ? 'bg-white font-semibold shadow-sm' : 'text-slate-500'"
-            @click="mode = 'odo'"
-          >
-            Odo counter
-          </button>
-          <button
-            type="button"
-            class="flex-1 px-3 py-2 text-sm transition-colors"
-            :class="mode === 'trip' ? 'bg-white font-semibold shadow-sm' : 'text-slate-500'"
-            @click="mode = 'trip'"
-          >
-            Trip meter
-          </button>
-        </div>
-
-        <label v-if="mode === 'odo'" class="block">
+        <label class="block">
           <span class="text-sm font-medium text-slate-700"
             >Odo counter ({{ distanceUnit }})</span
           >
@@ -303,21 +274,6 @@ async function remove() {
             class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
           />
           <span v-if="lastOdoHint" class="mt-1 block text-xs text-slate-400">{{ lastOdoHint }}</span>
-        </label>
-
-        <label v-else class="block">
-          <span class="text-sm font-medium text-slate-700">Trip meter ({{ distanceUnit }})</span>
-          <input
-            v-model.number="tripInput"
-            type="number"
-            min="0"
-            step="0.1"
-            inputmode="decimal"
-            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-          />
-          <span v-if="lastOdoHint" class="mt-1 block text-xs text-slate-400">
-            Adds to {{ lastOdoHint?.replace('Last value: ', '') }}
-          </span>
         </label>
 
         <div class="grid grid-cols-2 gap-3">
