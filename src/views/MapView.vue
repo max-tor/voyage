@@ -3,10 +3,12 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import L, { type CircleMarker, type Map as LMap } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import CitySearch from '@/components/CitySearch.vue'
 import PriceFilterBar from '@/components/PriceFilterBar.vue'
 import { useGeolocation } from '@/composables/useGeolocation'
 import { useStationsStore } from '@/stores/stations'
 import { distanceKm } from '@/services/overpass'
+import type { GeocodeResult } from '@/services/geocoding'
 import type { FuelKind, MapStation, SortMode } from '@/types/prices'
 
 const mapEl = ref<HTMLDivElement | null>(null)
@@ -14,7 +16,14 @@ let map: LMap | null = null
 let userMarker: CircleMarker | null = null
 let stationMarkers: CircleMarker[] = []
 
-const { location, error: geoError, loading: geoLoading, locate } = useGeolocation()
+const {
+  location,
+  error: geoError,
+  loading: geoLoading,
+  locate,
+  setLocation,
+} = useGeolocation()
+const viewLabel = ref<string | null>(null)
 const stations = useStationsStore()
 const selected = ref<MapStation | null>(null)
 const fuel = ref<FuelKind>('e5')
@@ -130,10 +139,20 @@ function renderStations() {
 async function recenter() {
   const here = await locate()
   if (here && map) {
+    viewLabel.value = null
     map.setView([here.lat, here.lng], 14)
     addUserMarker(here.lat, here.lng)
     await stations.loadAround(here.lat, here.lng)
   }
+}
+
+async function gotoCity(result: GeocodeResult) {
+  if (!map) return
+  setLocation({ lat: result.lat, lng: result.lng, accuracy: 0 })
+  viewLabel.value = result.displayName.split(',')[0].trim()
+  map.setView([result.lat, result.lng], 13)
+  addUserMarker(result.lat, result.lng)
+  await stations.loadAround(result.lat, result.lng)
 }
 
 function distanceTo(s: MapStation): string {
@@ -182,13 +201,19 @@ function relativeTime(iso: string): string {
     <div ref="mapEl" class="absolute inset-0 z-0"></div>
 
     <div class="pointer-events-none absolute inset-x-0 top-0 z-10 space-y-2 p-3">
+      <div class="pointer-events-auto">
+        <CitySearch @select="gotoCity" />
+      </div>
+
       <div
         class="pointer-events-auto flex items-center justify-between gap-2 rounded-full bg-white/95 px-4 py-2 shadow-md backdrop-blur"
       >
-        <h1 class="text-sm font-semibold">Stations nearby</h1>
+        <h1 class="truncate text-sm font-semibold">
+          {{ viewLabel ?? 'Stations nearby' }}
+        </h1>
         <span v-if="stations.loading" class="text-xs text-slate-500">Loading…</span>
         <span v-else-if="stations.error" class="text-xs text-red-600">{{ stations.error }}</span>
-        <span v-else class="text-xs text-slate-500">
+        <span v-else class="shrink-0 text-xs text-slate-500">
           {{ stations.items.length }} found
           <template v-if="stations.source === 'dgeg'"> · live</template>
         </span>

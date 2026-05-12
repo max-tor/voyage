@@ -45,5 +45,10 @@ export function useGeolocation() {
     }
   }
 
-  return { location, error, loading, locate }
+  function setLocation(next: UserLocation) {
+    location.value = next
+    error.value = null
+  }
+
+  return { location, error, loading, locate, setLocation }
 }
