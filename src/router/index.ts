@@ -36,6 +36,16 @@ const router = createRouter({
       component: () => import('@/views/GarageView.vue'),
     },
     {
+      path: '/garage/new',
+      name: 'garage-new',
+      component: () => import('@/views/CarFormView.vue'),
+    },
+    {
+      path: '/garage/:id',
+      name: 'garage-edit',
+      component: () => import('@/views/CarFormView.vue'),
+    },
+    {
       path: '/settings',
       name: 'settings',
       component: () => import('@/views/SettingsView.vue'),
