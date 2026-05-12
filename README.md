@@ -33,6 +33,9 @@ free real-time API at all. Voyage uses a per-country provider pattern:
 
 - **🇵🇹 Portugal** — DGEG official API (`precoscombustiveis.dgeg.gov.pt`), no
   key required, returns E5 + Diesel prices.
+- **🇨🇦 Quebec** — Régie essence Québec (`regieessencequebec.ca`), no key,
+  mandatory station reporting under Article 67.1 of the Petroleum Products
+  Act since April 1 2026. Single gzipped GeoJSON of all ~2,500 QC stations.
 - **Everywhere else** — stations come from OpenStreetMap (free Overpass
   API); prices come from your `station_prices` table, which is fed every
   time a user logs a fill-up at a station tapped from the map.

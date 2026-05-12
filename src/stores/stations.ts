@@ -2,19 +2,22 @@ import { defineStore } from 'pinia'
 import { fetchStationsAround } from '@/services/overpass'
 import { detectCountry } from '@/services/prices/country'
 import { fetchDgegStations } from '@/services/prices/dgeg'
+import { fetchRegieStations } from '@/services/prices/regieessence'
 import { loadCrowdsourcedPrices } from '@/services/stations-db'
 import type { MapStation } from '@/types/prices'
+
+export type StationsSource = 'dgeg' | 'regieessence' | 'osm'
 
 interface StationsState {
   items: MapStation[]
   loading: boolean
   error: string | null
-  source: 'dgeg' | 'osm' | null
+  source: StationsSource | null
   country: string | null
 }
 
-const OVERPASS_RADIUS_M = 25_000
-const DGEG_RADIUS_KM = 25
+const RADIUS_M = 25_000
+const RADIUS_KM = 25
 
 export const useStationsStore = defineStore('stations', {
   state: (): StationsState => ({
@@ -26,6 +29,8 @@ export const useStationsStore = defineStore('stations', {
   }),
   getters: {
     withPrices: (s) => s.items.filter((st) => st.prices != null),
+    /** Currency used by the active price source, fall-back EUR. */
+    currency: (s): string => s.items.find((st) => st.prices)?.prices?.currency ?? 'EUR',
   },
   actions: {
     async loadAround(lat: number, lng: number) {
@@ -37,10 +42,13 @@ export const useStationsStore = defineStore('stations', {
         let items: MapStation[]
 
         if (this.country === 'PT') {
-          items = await fetchDgegStations(lat, lng, DGEG_RADIUS_KM)
+          items = await fetchDgegStations(lat, lng, RADIUS_KM)
           this.source = 'dgeg'
+        } else if (this.country === 'CA-QC') {
+          items = await fetchRegieStations(lat, lng, RADIUS_KM)
+          this.source = 'regieessence'
         } else {
-          items = await fetchStationsAround(lat, lng, OVERPASS_RADIUS_M)
+          items = await fetchStationsAround(lat, lng, RADIUS_M)
           this.source = 'osm'
 
           try {

@@ -215,7 +215,9 @@ function relativeTime(iso: string): string {
         <span v-else-if="stations.error" class="text-xs text-red-600">{{ stations.error }}</span>
         <span v-else class="shrink-0 text-xs text-slate-500">
           {{ stations.items.length }} found
-          <template v-if="stations.source === 'dgeg'"> · live</template>
+          <template v-if="stations.source === 'dgeg' || stations.source === 'regieessence'">
+            · live
+          </template>
         </span>
       </div>
 
@@ -232,7 +234,7 @@ function relativeTime(iso: string): string {
         v-if="cheapestPrice != null"
         class="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 shadow-sm ring-1 ring-emerald-200"
       >
-        Cheapest: {{ cheapestPrice.toFixed(3) }} €/l
+        Cheapest: {{ cheapestPrice.toFixed(3) }} {{ stations.currency }}/l
       </div>
     </div>
 

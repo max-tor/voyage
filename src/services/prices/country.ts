@@ -3,8 +3,8 @@
 
 type BBox = readonly [minLat: number, minLng: number, maxLat: number, maxLng: number]
 
-// Portugal mainland is listed before Spain so points near the western Iberian
-// border resolve to PT (Spain's bbox would otherwise include parts of PT).
+// Order matters: more specific regions (e.g. PT before ES, CA-QC before CA)
+// are checked first so the first hit wins.
 const BBOXES: Record<string, BBox> = {
   PT: [36.96, -9.52, 42.16, -6.19],
   ES: [35.95, -9.39, 43.79, 4.33],
@@ -17,6 +17,7 @@ const BBOXES: Record<string, BBox> = {
   NL: [50.75, 3.36, 53.55, 7.23],
   GB: [49.96, -8.65, 60.85, 1.76],
   PL: [49.0, 14.12, 54.84, 24.15],
+  'CA-QC': [44.99, -79.76, 62.58, -57.1],
   CA: [41.68, -141.0, 83.11, -52.62],
 }
 
