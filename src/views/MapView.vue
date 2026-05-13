@@ -75,7 +75,7 @@ onMounted(async () => {
   if (!mapEl.value) return
 
   map = L.map(mapEl.value, { zoomControl: false }).setView(DEFAULT_CENTER, DEFAULT_ZOOM)
-  L.control.zoom({ position: 'topright' }).addTo(map)
+  L.control.zoom({ position: 'bottomleft' }).addTo(map)
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap',
     maxZoom: 19,
@@ -260,7 +260,7 @@ function relativeTime(iso: string): string {
       <button
         v-if="cheapestPrice != null"
         type="button"
-        class="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-soft ring-1 ring-emerald-500/20 backdrop-blur-xl transition-all hover:bg-emerald-100 hover:shadow-soft-md active:scale-[0.98]"
+        class="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-soft ring-1 ring-emerald-500/20 backdrop-blur-xl transition-all hover:bg-emerald-100 hover:shadow-soft-md active:scale-[0.98] relative top-[2px] ml-[8px]"
         :aria-label="`Open cheapest station at ${cheapestPrice.toFixed(3)} ${stations.currency} per litre`"
         @click="focusCheapest"
       >
