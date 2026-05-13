@@ -1,9 +1,9 @@
 {
-  "trailingSlash": false,
   "rewrites": [
     { "source": "/voyage/assets/(.*)", "destination": "/assets/$1" },
     { "source": "/voyage/favicon.svg", "destination": "/favicon.svg" },
     { "source": "/voyage", "destination": "/index.html" },
+    { "source": "/voyage/", "destination": "/index.html" },
     { "source": "/voyage/(.*)", "destination": "/index.html" }
   ]
 }
