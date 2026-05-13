@@ -34,35 +34,39 @@ async function submit() {
 <template>
   <div class="flex min-h-full items-center justify-center px-6 py-12">
     <div class="w-full max-w-sm">
-      <h1 class="mb-1 text-2xl font-bold tracking-tight">Create your account</h1>
-      <p class="mb-8 text-sm text-slate-500">Track fuel, find cheap stations nearby.</p>
+      <h1 class="mb-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+        Create your account
+      </h1>
+      <p class="mb-8 text-sm text-slate-500 dark:text-slate-400">
+        Track fuel, find cheap stations nearby.
+      </p>
 
       <form class="space-y-4" @submit.prevent="submit">
         <label class="block">
-          <span class="text-sm font-medium text-slate-700">Email</span>
+          <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Email</span>
           <input
             v-model="email"
             type="email"
             required
             autocomplete="email"
-            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm shadow-soft transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm shadow-soft transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           />
         </label>
 
         <label class="block">
-          <span class="text-sm font-medium text-slate-700">Password</span>
+          <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Password</span>
           <input
             v-model="password"
             type="password"
             required
             minlength="6"
             autocomplete="new-password"
-            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm shadow-soft transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm shadow-soft transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           />
         </label>
 
-        <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
-        <p v-if="info" class="text-sm text-emerald-600">{{ info }}</p>
+        <p v-if="error" class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+        <p v-if="info" class="text-sm text-emerald-600 dark:text-emerald-400">{{ info }}</p>
 
         <button
           type="submit"
@@ -73,9 +77,11 @@ async function submit() {
         </button>
       </form>
 
-      <p class="mt-8 text-center text-sm text-slate-600">
+      <p class="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
         Already have an account?
-        <RouterLink to="/login" class="font-semibold text-brand-600 hover:text-brand-700"
+        <RouterLink
+          to="/login"
+          class="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
           >Sign in</RouterLink
         >
       </p>

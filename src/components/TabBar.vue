@@ -20,7 +20,7 @@ function isActive(name: string) {
 
 <template>
   <nav
-    class="fixed inset-x-0 bottom-0 z-40 border-t border-slate-900/5 bg-white/85 pb-safe backdrop-blur-xl"
+    class="fixed inset-x-0 bottom-0 z-40 border-t border-slate-900/5 bg-white/85 pb-safe backdrop-blur-xl dark:border-white/5 dark:bg-slate-950/80"
     aria-label="Primary"
   >
     <ul class="mx-auto flex max-w-md justify-around px-2 py-2">
@@ -30,8 +30,8 @@ function isActive(name: string) {
           class="group flex flex-col items-center gap-1 rounded-xl px-2 py-1.5 transition-colors"
           :class="
             isActive(tab.name)
-              ? 'text-brand-600'
-              : 'text-slate-500 hover:text-slate-900'
+              ? 'text-brand-600 dark:text-brand-300'
+              : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100'
           "
         >
           <component

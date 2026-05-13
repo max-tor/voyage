@@ -223,24 +223,31 @@ function relativeTime(iso: string): string {
       </div>
 
       <div
-        class="pointer-events-auto flex items-center justify-between gap-2 rounded-full bg-white/90 px-4 py-2 shadow-soft-md ring-1 ring-slate-900/5 backdrop-blur-xl"
+        class="pointer-events-auto flex items-center justify-between gap-2 rounded-full bg-white/90 px-4 py-2 shadow-soft-md ring-1 ring-slate-900/5 backdrop-blur-xl dark:bg-slate-900/80 dark:ring-white/10"
       >
-        <h1 class="truncate text-sm font-semibold text-slate-900">
+        <h1 class="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
           {{ viewLabel ?? 'Stations nearby' }}
         </h1>
         <span
           v-if="stations.loading"
-          class="flex shrink-0 items-center gap-1 text-xs text-slate-500"
+          class="flex shrink-0 items-center gap-1 text-xs text-slate-500 dark:text-slate-400"
         >
           <Loader2 :size="12" class="animate-spin" />
           Loading
         </span>
-        <span v-else-if="stations.error" class="text-xs text-red-600">{{ stations.error }}</span>
-        <span v-else class="flex shrink-0 items-center gap-1.5 text-xs text-slate-500">
+        <span
+          v-else-if="stations.error"
+          class="text-xs text-red-600 dark:text-red-400"
+          >{{ stations.error }}</span
+        >
+        <span
+          v-else
+          class="flex shrink-0 items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400"
+        >
           {{ stations.items.length }} found
           <span
             v-if="stations.source === 'dgeg' || stations.source === 'regieessence'"
-            class="flex items-center gap-1 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700"
+            class="flex items-center gap-1 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
           >
             <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
             Live
@@ -260,7 +267,7 @@ function relativeTime(iso: string): string {
       <button
         v-if="cheapestPrice != null"
         type="button"
-        class="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-soft ring-1 ring-emerald-500/20 backdrop-blur-xl transition-all hover:bg-emerald-100 hover:shadow-soft-md active:scale-[0.98] relative top-[2px] ml-[8px]"
+        class="pointer-events-auto relative top-[2px] ml-[8px] inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-soft ring-1 ring-emerald-500/20 backdrop-blur-xl transition-all hover:bg-emerald-100 hover:shadow-soft-md active:scale-[0.98] dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-400/30 dark:hover:bg-emerald-500/25"
         :aria-label="`Open cheapest station at ${cheapestPrice.toFixed(3)} ${stations.currency} per litre`"
         @click="focusCheapest"
       >
@@ -271,7 +278,7 @@ function relativeTime(iso: string): string {
 
     <button
       type="button"
-      class="absolute bottom-4 right-3 z-10 grid h-12 w-12 place-items-center rounded-full bg-white text-slate-700 shadow-soft-lg ring-1 ring-slate-900/5 transition-all hover:bg-slate-50 active:scale-95 disabled:opacity-60"
+      class="absolute bottom-4 right-3 z-10 grid h-12 w-12 place-items-center rounded-full bg-white text-slate-700 shadow-soft-lg ring-1 ring-slate-900/5 transition-all hover:bg-slate-50 active:scale-95 disabled:opacity-60 dark:bg-slate-900 dark:text-slate-200 dark:ring-white/10 dark:hover:bg-slate-800"
       :disabled="geoLoading"
       :aria-label="geoLoading ? 'Locating…' : 'Locate me'"
       @click="recenter"
@@ -289,27 +296,29 @@ function relativeTime(iso: string): string {
 
     <div
       v-if="selected"
-      class="absolute inset-x-3 bottom-3 z-20 rounded-2xl bg-white p-4 shadow-soft-lg ring-1 ring-slate-900/5"
+      class="absolute inset-x-3 bottom-3 z-20 rounded-2xl bg-white p-4 shadow-soft-lg ring-1 ring-slate-900/5 dark:bg-slate-900 dark:ring-white/10"
     >
       <div class="flex items-start justify-between gap-3">
         <div class="min-w-0 flex-1">
-          <p class="truncate font-semibold text-slate-900">
+          <p class="truncate font-semibold text-slate-900 dark:text-slate-100">
             {{ selected.name ?? selected.brand ?? 'Fuel station' }}
           </p>
           <p
             v-if="selected.brand && selected.brand !== selected.name"
-            class="truncate text-sm text-slate-500"
+            class="truncate text-sm text-slate-500 dark:text-slate-400"
           >
             {{ selected.brand }}
           </p>
-          <p v-if="selected.address" class="truncate text-xs text-slate-500">
+          <p v-if="selected.address" class="truncate text-xs text-slate-500 dark:text-slate-400">
             {{ selected.address }}
           </p>
-          <p v-if="location" class="mt-1 text-xs text-slate-400">{{ distanceTo(selected) }} away</p>
+          <p v-if="location" class="mt-1 text-xs text-slate-400 dark:text-slate-500">
+            {{ distanceTo(selected) }} away
+          </p>
         </div>
         <button
           type="button"
-          class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-500 transition-colors hover:bg-slate-200"
+          class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-500 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
           aria-label="Close"
           @click="selected = null"
         >
@@ -318,29 +327,41 @@ function relativeTime(iso: string): string {
       </div>
 
       <dl v-if="selected.prices" class="mt-3 grid grid-cols-3 gap-2 text-center">
-        <div class="rounded-xl bg-slate-50 p-2">
-          <dt class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">E5</dt>
-          <dd class="mt-0.5 text-sm font-semibold text-slate-900">
+        <div class="rounded-xl bg-slate-50 p-2 dark:bg-slate-800/60">
+          <dt
+            class="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+          >
+            E5
+          </dt>
+          <dd class="mt-0.5 text-sm font-semibold text-slate-900 dark:text-slate-100">
             {{ formatPrice(selected.prices.e5, selected.prices.currency) }}
           </dd>
         </div>
-        <div class="rounded-xl bg-slate-50 p-2">
-          <dt class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">E10</dt>
-          <dd class="mt-0.5 text-sm font-semibold text-slate-900">
+        <div class="rounded-xl bg-slate-50 p-2 dark:bg-slate-800/60">
+          <dt
+            class="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+          >
+            E10
+          </dt>
+          <dd class="mt-0.5 text-sm font-semibold text-slate-900 dark:text-slate-100">
             {{ formatPrice(selected.prices.e10, selected.prices.currency) }}
           </dd>
         </div>
-        <div class="rounded-xl bg-slate-50 p-2">
-          <dt class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Diesel</dt>
-          <dd class="mt-0.5 text-sm font-semibold text-slate-900">
+        <div class="rounded-xl bg-slate-50 p-2 dark:bg-slate-800/60">
+          <dt
+            class="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+          >
+            Diesel
+          </dt>
+          <dd class="mt-0.5 text-sm font-semibold text-slate-900 dark:text-slate-100">
             {{ formatPrice(selected.prices.diesel, selected.prices.currency) }}
           </dd>
         </div>
       </dl>
-      <p v-if="selected.prices" class="mt-2 text-[10px] text-slate-400">
+      <p v-if="selected.prices" class="mt-2 text-[10px] text-slate-400 dark:text-slate-500">
         Updated {{ relativeTime(selected.prices.reportedAt) }} · source {{ selected.prices.source }}
       </p>
-      <p v-else class="mt-3 text-xs text-slate-500">
+      <p v-else class="mt-3 text-xs text-slate-500 dark:text-slate-400">
         No price yet — log a fill-up to contribute one.
       </p>
 
@@ -356,7 +377,7 @@ function relativeTime(iso: string): string {
         </a>
         <RouterLink
           :to="logFillupLink(selected)"
-          class="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-center text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50 active:scale-[0.98]"
+          class="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-center text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50 active:scale-[0.98] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
           >Log fill-up</RouterLink
         >
       </div>

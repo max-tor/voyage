@@ -75,27 +75,27 @@ onBeforeUnmount(() => {
 <template>
   <div class="relative">
     <div
-      class="flex items-center gap-2.5 rounded-full bg-white/90 px-4 py-2.5 shadow-soft-md ring-1 ring-slate-900/5 backdrop-blur-xl transition-shadow focus-within:shadow-soft-lg focus-within:ring-brand-500/30"
+      class="flex items-center gap-2.5 rounded-full bg-white/90 px-4 py-2.5 shadow-soft-md ring-1 ring-slate-900/5 backdrop-blur-xl transition-shadow focus-within:shadow-soft-lg focus-within:ring-brand-500/30 dark:bg-slate-900/80 dark:ring-white/10 dark:focus-within:ring-brand-400/40"
     >
-      <Search :size="16" class="shrink-0 text-slate-400" aria-hidden="true" />
+      <Search :size="16" class="shrink-0 text-slate-400 dark:text-slate-500" aria-hidden="true" />
       <input
         v-model="query"
         type="search"
         placeholder="Search a city or address"
-        class="flex-1 bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
+        class="flex-1 bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-slate-100 dark:placeholder:text-slate-500"
         @focus="open = true"
         @blur="onBlur"
       />
       <Loader2
         v-if="loading"
         :size="14"
-        class="shrink-0 animate-spin text-slate-400"
+        class="shrink-0 animate-spin text-slate-400 dark:text-slate-500"
         aria-hidden="true"
       />
       <button
         v-else-if="query"
         type="button"
-        class="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-slate-200 text-slate-600 transition-colors hover:bg-slate-300"
+        class="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-slate-200 text-slate-600 transition-colors hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
         aria-label="Clear"
         @click="clear"
       >
@@ -105,18 +105,22 @@ onBeforeUnmount(() => {
 
     <div
       v-if="open && (results.length > 0 || errorMsg)"
-      class="absolute inset-x-0 top-full z-30 mt-1.5 max-h-72 overflow-y-auto rounded-2xl bg-white shadow-soft-lg ring-1 ring-slate-900/5"
+      class="absolute inset-x-0 top-full z-30 mt-1.5 max-h-72 overflow-y-auto rounded-2xl bg-white shadow-soft-lg ring-1 ring-slate-900/5 dark:bg-slate-900 dark:ring-white/10"
     >
-      <p v-if="errorMsg" class="px-3 py-2 text-xs text-red-600">{{ errorMsg }}</p>
+      <p v-if="errorMsg" class="px-3 py-2 text-xs text-red-600 dark:text-red-400">{{ errorMsg }}</p>
       <ul v-else class="py-1">
         <li v-for="r in results" :key="`${r.lat}-${r.lng}-${r.displayName}`">
           <button
             type="button"
-            class="block w-full px-3 py-2 text-left text-sm transition-colors hover:bg-slate-50"
+            class="block w-full px-3 py-2 text-left text-sm transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
             @mousedown.prevent="pick(r)"
           >
-            <span class="block font-medium text-slate-900">{{ shortLabel(r.displayName) }}</span>
-            <span class="mt-0.5 block truncate text-xs text-slate-500">{{ r.displayName }}</span>
+            <span class="block font-medium text-slate-900 dark:text-slate-100">{{
+              shortLabel(r.displayName)
+            }}</span>
+            <span class="mt-0.5 block truncate text-xs text-slate-500 dark:text-slate-400">{{
+              r.displayName
+            }}</span>
           </button>
         </li>
       </ul>
