@@ -33,35 +33,25 @@ const sort = ref<SortMode>('distance')
 const DEFAULT_CENTER: [number, number] = [50.5, 10]
 const DEFAULT_ZOOM = 4
 
-const ranked = computed<MapStation[]>(() => {
-  const here = location.value
-  const items = [...stations.items]
-  if (sort.value === 'price') {
-    return items.sort((a, b) => {
-      const pa = a.prices?.[fuel.value]
-      const pb = b.prices?.[fuel.value]
-      if (pa == null && pb == null) return 0
-      if (pa == null) return 1
-      if (pb == null) return -1
-      return pa - pb
-    })
-  }
-  if (!here) return items
-  return items.sort(
-    (a, b) =>
-      distanceKm(here.lat, here.lng, a.lat, a.lng) -
-      distanceKm(here.lat, here.lng, b.lat, b.lng),
-  )
+/**
+ * In "price" mode only stations with a price for the selected fuel are
+ * shown. Falls back to all stations when nothing in the area has prices,
+ * so the user isn't staring at an empty map.
+ */
+const visibleStations = computed<MapStation[]>(() => {
+  if (sort.value !== 'price') return stations.items
+  const withPrices = stations.items.filter((s) => s.prices?.[fuel.value] != null)
+  return withPrices.length > 0 ? withPrices : stations.items
 })
 
-const cheapestPrice = computed<number | null>(() => {
-  let min: number | null = null
-  for (const s of stations.items) {
-    const p = s.prices?.[fuel.value]
-    if (p != null && (min == null || p < min)) min = p
-  }
-  return min
-})
+const sortedPrices = computed<number[]>(() =>
+  stations.items
+    .map((s) => s.prices?.[fuel.value])
+    .filter((p): p is number => p != null)
+    .sort((a, b) => a - b),
+)
+
+const cheapestPrice = computed<number | null>(() => sortedPrices.value[0] ?? null)
 
 const cheapestStationId = computed<string | null>(() => {
   if (cheapestPrice.value == null) return null
@@ -69,7 +59,7 @@ const cheapestStationId = computed<string | null>(() => {
   return hit?.osm_id ?? null
 })
 
-watch([() => stations.items, fuel, sort], renderStations, { deep: false })
+watch([visibleStations, fuel, sort, cheapestStationId], renderStations, { deep: false })
 
 onMounted(async () => {
   if (!mapEl.value) return
@@ -113,16 +103,32 @@ function addUserMarker(lat: number, lng: number) {
 function markerColorFor(s: MapStation): string {
   const price = s.prices?.[fuel.value]
   if (price == null) return '#94a3b8' // slate-400 = no price
-  if (cheapestPrice.value != null && Math.abs(price - cheapestPrice.value) < 0.001)
-    return '#16a34a' // green = cheapest
-  return '#f59e0b' // amber = has price but not cheapest
+
+  if (sort.value === 'price') {
+    // Cheap mode: colour by price quartile so cheap stations stand out
+    // and expensive ones look expensive.
+    const sorted = sortedPrices.value
+    if (sorted.length < 2) return '#16a34a'
+    const idx = sorted.indexOf(price)
+    const pct = idx / (sorted.length - 1)
+    if (pct <= 0.33) return '#16a34a' // green — bottom third (cheap)
+    if (pct <= 0.66) return '#f59e0b' // amber — middle third
+    return '#dc2626' // red — top third (expensive)
+  }
+
+  // Near mode: only the single cheapest is highlighted; everything else
+  // with a price is amber; missing prices stay slate.
+  if (cheapestPrice.value != null && Math.abs(price - cheapestPrice.value) < 0.001) {
+    return '#16a34a'
+  }
+  return '#f59e0b'
 }
 
 function renderStations() {
   if (!map) return
   stationMarkers.forEach((m) => m.remove())
   stationMarkers = []
-  for (const s of stations.items) {
+  for (const s of visibleStations.value) {
     const isCheapest = s.osm_id === cheapestStationId.value
     const m = L.circleMarker([s.lat, s.lng], {
       radius: isCheapest ? 10 : 7,
