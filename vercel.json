@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/voyage/assets/:path*", "destination": "/assets/:path*" },
+    { "source": "/voyage/favicon.svg", "destination": "/favicon.svg" },
+    { "source": "/voyage/:path*", "destination": "/index.html" },
+    { "source": "/voyage", "destination": "/index.html" }
+  ]
+}
