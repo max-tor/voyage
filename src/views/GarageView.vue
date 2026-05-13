@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
+import { Car, ChevronRight, Plus } from 'lucide-vue-next'
 import { useGarageStore } from '@/stores/garage'
 import { getCarPhotoUrl } from '@/services/cars'
 import { FUEL_TYPE_LABELS } from '@/types/database'
@@ -25,18 +26,22 @@ async function makeActive(id: string) {
 </script>
 
 <template>
-  <section class="px-4 py-6">
-    <header class="mb-4 flex items-center justify-between">
-      <h1 class="text-2xl font-bold">Garage</h1>
+  <section class="mx-auto max-w-2xl px-4 py-6">
+    <header class="mb-6 flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight">Garage</h1>
+        <p class="mt-0.5 text-sm text-slate-500">Your vehicles, ready to track.</p>
+      </div>
       <RouterLink
         to="/garage/new"
-        class="rounded-md bg-brand-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-700"
+        class="inline-flex items-center gap-1 rounded-xl bg-brand-600 px-3 py-2 text-sm font-semibold text-white shadow-glow-brand transition-all hover:bg-brand-700 active:scale-[0.98]"
       >
-        + Add car
+        <Plus :size="14" />
+        Add car
       </RouterLink>
     </header>
 
-    <p v-if="garage.error" class="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+    <p v-if="garage.error" class="mb-4 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">
       {{ garage.error }}
     </p>
 
@@ -44,12 +49,18 @@ async function makeActive(id: string) {
 
     <div
       v-else-if="garage.cars.length === 0"
-      class="flex flex-col items-center gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center"
+      class="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-slate-200 bg-white/60 px-6 py-16 text-center"
     >
-      <p class="text-sm text-slate-500">No cars yet.</p>
+      <div class="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-600">
+        <Car :size="24" />
+      </div>
+      <div>
+        <p class="font-semibold text-slate-900">No cars yet</p>
+        <p class="mt-1 text-sm text-slate-500">Add one to start logging fill-ups.</p>
+      </div>
       <RouterLink
         to="/garage/new"
-        class="rounded-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
+        class="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-glow-brand transition-all hover:bg-brand-700 active:scale-[0.98]"
       >
         Add your first car
       </RouterLink>
@@ -59,30 +70,27 @@ async function makeActive(id: string) {
       <li
         v-for="car in garage.cars"
         :key="car.id"
-        class="flex items-center gap-3 rounded-lg bg-white p-3 ring-1"
-        :class="car.is_active ? 'ring-brand-500' : 'ring-slate-200'"
+        class="flex items-center gap-3 rounded-2xl bg-white p-3 shadow-soft ring-1 transition-shadow hover:shadow-soft-md"
+        :class="car.is_active ? 'ring-brand-500/40' : 'ring-slate-900/5'"
       >
-        <div class="h-14 w-14 shrink-0 overflow-hidden rounded-md bg-slate-100">
+        <div class="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-slate-100">
           <img
             v-if="car.photo_path"
             :src="getCarPhotoUrl(car.photo_path) ?? ''"
             alt=""
             class="h-full w-full object-cover"
           />
-          <div
-            v-else
-            class="flex h-full w-full items-center justify-center text-xl text-slate-400"
-          >
-            🚗
+          <div v-else class="flex h-full w-full items-center justify-center text-slate-300">
+            <Car :size="22" />
           </div>
         </div>
 
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2">
-            <p class="truncate font-semibold">{{ car.name }}</p>
+            <p class="truncate font-semibold text-slate-900">{{ car.name }}</p>
             <span
               v-if="car.is_active"
-              class="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-700"
+              class="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand-700"
               >Active</span
             >
           </div>
@@ -93,16 +101,18 @@ async function makeActive(id: string) {
           </p>
         </div>
 
-        <div class="flex flex-col items-end gap-1">
+        <div class="flex flex-col items-end gap-1.5">
           <RouterLink
             :to="`/garage/${car.id}`"
-            class="text-xs font-medium text-brand-600 hover:underline"
-            >Edit</RouterLink
+            class="inline-flex items-center gap-0.5 text-xs font-semibold text-brand-600 hover:text-brand-700"
           >
+            Edit
+            <ChevronRight :size="12" />
+          </RouterLink>
           <button
             v-if="!car.is_active"
             type="button"
-            class="text-xs text-slate-500 hover:text-slate-800"
+            class="text-xs text-slate-500 hover:text-slate-900"
             @click="makeActive(car.id)"
           >
             Set active

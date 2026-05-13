@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ChevronDown } from 'lucide-vue-next'
 import { FUEL_KIND_LABELS, type FuelKind, type SortMode } from '@/types/prices'
 
 defineProps<{
@@ -15,27 +16,34 @@ const fuels = Object.entries(FUEL_KIND_LABELS) as [FuelKind, string][]
 
 <template>
   <div class="flex items-center gap-2">
-    <select
-      :value="fuel"
-      class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-brand-500"
-      @change="$emit('update:fuel', ($event.target as HTMLSelectElement).value as FuelKind)"
+    <div
+      class="relative flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 text-xs font-medium text-slate-700 shadow-soft ring-1 ring-slate-900/5 backdrop-blur-xl"
     >
-      <option v-for="[v, label] in fuels" :key="v" :value="v">{{ label }}</option>
-    </select>
+      <select
+        :value="fuel"
+        class="appearance-none bg-transparent pr-4 focus:outline-none"
+        @change="$emit('update:fuel', ($event.target as HTMLSelectElement).value as FuelKind)"
+      >
+        <option v-for="[v, label] in fuels" :key="v" :value="v">{{ label }}</option>
+      </select>
+      <ChevronDown :size="12" class="pointer-events-none absolute right-2 text-slate-400" />
+    </div>
 
-    <div class="flex overflow-hidden rounded-full bg-slate-100 text-xs">
+    <div
+      class="flex overflow-hidden rounded-full bg-white/70 p-0.5 text-xs shadow-soft ring-1 ring-slate-900/5 backdrop-blur-xl"
+    >
       <button
         type="button"
-        class="px-3 py-1.5 transition-colors"
-        :class="sort === 'distance' ? 'bg-white font-semibold shadow-sm' : 'text-slate-500'"
+        class="rounded-full px-3 py-1 transition-colors"
+        :class="sort === 'distance' ? 'bg-brand-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'"
         @click="$emit('update:sort', 'distance')"
       >
         Near
       </button>
       <button
         type="button"
-        class="px-3 py-1.5 transition-colors"
-        :class="sort === 'price' ? 'bg-white font-semibold shadow-sm' : 'text-slate-500'"
+        class="rounded-full px-3 py-1 transition-colors"
+        :class="sort === 'price' ? 'bg-brand-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'"
         @click="$emit('update:sort', 'price')"
       >
         Cheap

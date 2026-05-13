@@ -30,8 +30,8 @@ async function submit() {
 <template>
   <div class="flex min-h-full items-center justify-center px-6 py-12">
     <div class="w-full max-w-sm">
-      <h1 class="mb-1 text-2xl font-bold">Welcome back</h1>
-      <p class="mb-6 text-sm text-slate-500">Sign in to your Voyage account.</p>
+      <h1 class="mb-1 text-2xl font-bold tracking-tight">Welcome back</h1>
+      <p class="mb-8 text-sm text-slate-500">Sign in to your Voyage account.</p>
 
       <form class="space-y-4" @submit.prevent="submit">
         <label class="block">
@@ -41,7 +41,7 @@ async function submit() {
             type="email"
             required
             autocomplete="email"
-            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm shadow-soft transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
           />
         </label>
 
@@ -52,7 +52,7 @@ async function submit() {
             type="password"
             required
             autocomplete="current-password"
-            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm shadow-soft transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
           />
         </label>
 
@@ -61,15 +61,15 @@ async function submit() {
         <button
           type="submit"
           :disabled="loading"
-          class="w-full rounded-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 disabled:opacity-50"
+          class="w-full rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-glow-brand transition-all hover:bg-brand-700 active:scale-[0.98] disabled:opacity-50"
         >
           {{ loading ? 'Signing in…' : 'Sign in' }}
         </button>
       </form>
 
-      <p class="mt-6 text-center text-sm text-slate-600">
+      <p class="mt-8 text-center text-sm text-slate-600">
         No account yet?
-        <RouterLink to="/signup" class="font-semibold text-brand-600 hover:underline"
+        <RouterLink to="/signup" class="font-semibold text-brand-600 hover:text-brand-700"
           >Create one</RouterLink
         >
       </p>
