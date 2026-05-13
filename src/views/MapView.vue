@@ -53,11 +53,21 @@ const sortedPrices = computed<number[]>(() =>
 
 const cheapestPrice = computed<number | null>(() => sortedPrices.value[0] ?? null)
 
-const cheapestStationId = computed<string | null>(() => {
+const cheapestStation = computed<MapStation | null>(() => {
   if (cheapestPrice.value == null) return null
-  const hit = stations.items.find((s) => s.prices?.[fuel.value] === cheapestPrice.value)
-  return hit?.osm_id ?? null
+  return (
+    stations.items.find((s) => s.prices?.[fuel.value] === cheapestPrice.value) ?? null
+  )
 })
+
+const cheapestStationId = computed<string | null>(() => cheapestStation.value?.osm_id ?? null)
+
+function focusCheapest() {
+  const s = cheapestStation.value
+  if (!s || !map) return
+  selected.value = s
+  map.flyTo([s.lat, s.lng], 15, { duration: 0.6 })
+}
 
 watch([visibleStations, fuel, sort, cheapestStationId], renderStations, { deep: false })
 
@@ -247,13 +257,16 @@ function relativeTime(iso: string): string {
         />
       </div>
 
-      <div
+      <button
         v-if="cheapestPrice != null"
-        class="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-soft ring-1 ring-emerald-500/20 backdrop-blur-xl"
+        type="button"
+        class="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-soft ring-1 ring-emerald-500/20 backdrop-blur-xl transition-all hover:bg-emerald-100 hover:shadow-soft-md active:scale-[0.98]"
+        :aria-label="`Open cheapest station at ${cheapestPrice.toFixed(3)} ${stations.currency} per litre`"
+        @click="focusCheapest"
       >
         <Sparkles :size="12" />
         Cheapest {{ cheapestPrice.toFixed(3) }} {{ stations.currency }}/l
-      </div>
+      </button>
     </div>
 
     <button
